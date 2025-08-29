@@ -1,0 +1,9 @@
+{
+  "name": "피아노 웹앱",
+  "short_name": "Piano",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "landscape",
+  "theme_color": "#fffb2a",
+  "background_color": "#fffb2a"
+}

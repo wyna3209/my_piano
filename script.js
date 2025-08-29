@@ -181,6 +181,8 @@ piano.addEventListener('mouseup', e => {
 const touchMap = new Map();
 
 piano.addEventListener('touchstart', e => {
+  // 동시 터치 감지 로그
+  if (e.touches.length > 1) console.log(`Simultaneous touches: ${e.touches.length}`);
   e.preventDefault();
   for (const touch of e.changedTouches) {
     let el = document.elementFromPoint(touch.clientX, touch.clientY);
