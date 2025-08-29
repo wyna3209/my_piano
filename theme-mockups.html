@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>피아노 웹앱 - 테마 시안</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+    
+    .theme-showcase {
+      margin-bottom: 40px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease;
+    }
+    
+    .theme-showcase:hover {
+      transform: translateY(-5px);
+    }
+    
+    .theme-header {
+      padding: 15px 20px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      color: white;
+    }
+    
+    .theme-content {
+      padding: 20px;
+      text-align: center;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .piano-demo {
+      display: flex;
+      gap: 2px;
+      margin: 20px 0;
+      position: relative;
+    }
+    
+    .white-key-demo {
+      width: 40px;
+      height: 120px;
+      border-radius: 0 0 4px 4px;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .black-key-demo {
+      width: 25px;
+      height: 75px;
+      position: absolute;
+      border-radius: 0 0 3px 3px;
+      margin-left: -12.5px;
+      z-index: 2;
+    }
+    
+    .chord-buttons-demo {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .chord-btn-demo {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .chord-btn-demo:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* 테마 1: 클래식 (기본) */
+    .classic {
+      background: #f8f9fa;
+      color: #333;
+    }
+    .classic .theme-header {
+      background: #2c3e50;
+    }
+    .classic .white-key-demo {
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+    .classic .black-key-demo {
+      background: #2c3e50;
+      border: 1px solid #34495e;
+    }
+    .classic .chord-btn-demo {
+      background: #3498db;
+      color: white;
+    }
+    
+    /* 테마 2: 다크 모드 */
+    .dark {
+      background: #1a1a1a;
+      color: #fff;
+    }
+    .dark .theme-header {
+      background: #2d3748;
+    }
+    .dark .white-key-demo {
+      background: #f7fafc;
+      border: 1px solid #4a5568;
+    }
+    .dark .black-key-demo {
+      background: #2d3748;
+      border: 1px solid #4a5568;
+    }
+    .dark .chord-btn-demo {
+      background: #4299e1;
+      color: #fff;
+    }
+    
+    /* 테마 3: 선셋 */
+    .sunset {
+      background: #fff5f5;
+      color: #2d3748;
+    }
+    .sunset .theme-header {
+      background: #e53e3e;
+    }
+    .sunset .white-key-demo {
+      background: #fff;
+      border: 1px solid #fed7d7;
+    }
+    .sunset .black-key-demo {
+      background: #742a2a;
+      border: 1px solid #e53e3e;
+    }
+    .sunset .chord-btn-demo {
+      background: #f56565;
+      color: white;
+    }
+    
+    /* 테마 4: 오션 */
+    .ocean {
+      background: #f0f8ff;
+      color: #2d3748;
+    }
+    .ocean .theme-header {
+      background: #2b6cb0;
+    }
+    .ocean .white-key-demo {
+      background: #fff;
+      border: 1px solid #bee3f8;
+    }
+    .ocean .black-key-demo {
+      background: #2c5282;
+      border: 1px solid #2b6cb0;
+    }
+    .ocean .chord-btn-demo {
+      background: #4299e1;
+      color: white;
+    }
+    
+    /* 테마 5: 포레스트 */
+    .forest {
+      background: #f0fff4;
+      color: #2d3748;
+    }
+    .forest .theme-header {
+      background: #38a169;
+    }
+    .forest .white-key-demo {
+      background: #fff;
+      border: 1px solid #c6f6d5;
+    }
+    .forest .black-key-demo {
+      background: #276749;
+      border: 1px solid #38a169;
+    }
+    .forest .chord-btn-demo {
+      background: #48bb78;
+      color: white;
+    }
+    
+    /* 테마 6: 로얄 */
+    .royal {
+      background: #faf5ff;
+      color: #2d3748;
+    }
+    .royal .theme-header {
+      background: #805ad5;
+    }
+    .royal .white-key-demo {
+      background: #fff;
+      border: 1px solid #e9d8fd;
+    }
+    .royal .black-key-demo {
+      background: #553c9a;
+      border: 1px solid #805ad5;
+    }
+    .royal .chord-btn-demo {
+      background: #9f7aea;
+      color: white;
+    }
+    
+    /* 테마 7: 민트 */
+    .mint {
+      background: #f0fdfa;
+      color: #2d3748;
+    }
+    .mint .theme-header {
+      background: #319795;
+    }
+    .mint .white-key-demo {
+      background: #fff;
+      border: 1px solid #b2f5ea;
+    }
+    .mint .black-key-demo {
+      background: #2c7a7b;
+      border: 1px solid #319795;
+    }
+    .mint .chord-btn-demo {
+      background: #4fd1c7;
+      color: white;
+    }
+    
+    /* 테마 8: 골드 */
+    .gold {
+      background: #fffaf0;
+      color: #2d3748;
+    }
+    .gold .theme-header {
+      background: #d69e2e;
+    }
+    .gold .white-key-demo {
+      background: #fff;
+      border: 1px solid #faf089;
+    }
+    .gold .black-key-demo {
+      background: #975a16;
+      border: 1px solid #d69e2e;
+    }
+    .gold .chord-btn-demo {
+      background: #ecc94b;
+      color: white;
+    }
+    
+    .theme-info {
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+    
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: #4CAF50;
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.2s ease;
+    }
+    
+    .back-button:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-button">← 메인으로</a>
+  
+  <h1>🎹 피아노 웹앱 테마 시안</h1>
+  
+  <!-- 테마 1: 클래식 -->
+  <div class="theme-showcase classic">
+    <div class="theme-header">🌟 클래식 (기본)</div>
+    <div class="theme-content">
+      <h3>밝고 깔끔한 기본 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">노란색 배경에 초록색 포인트로 활기찬 느낌</div>
+    </div>
+  </div>
+  
+  <!-- 테마 2: 다크 모드 -->
+  <div class="theme-showcase dark">
+    <div class="theme-header">🌙 다크 모드</div>
+    <div class="theme-content">
+      <h3>세련되고 모던한 어두운 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">눈의 피로를 줄이는 어두운 배경</div>
+    </div>
+  </div>
+  
+  <!-- 테마 3: 선셋 -->
+  <div class="theme-showcase sunset">
+    <div class="theme-header">🌅 선셋</div>
+    <div class="theme-content">
+      <h3>따뜻하고 감성적인 노을 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">핑크와 오렌지의 로맨틱한 조합</div>
+    </div>
+  </div>
+  
+  <!-- 테마 4: 오션 -->
+  <div class="theme-showcase ocean">
+    <div class="theme-header">🌊 오션</div>
+    <div class="theme-content">
+      <h3>시원하고 평온한 바다 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">블루 톤의 차분하고 시원한 느낌</div>
+    </div>
+  </div>
+  
+  <!-- 테마 5: 포레스트 -->
+  <div class="theme-showcase forest">
+    <div class="theme-header">🌲 포레스트</div>
+    <div class="theme-content">
+      <h3>자연스럽고 싱싱한 숲 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">초록과 청록의 자연스러운 조화</div>
+    </div>
+  </div>
+  
+  <!-- 테마 6: 로얄 -->
+  <div class="theme-showcase royal">
+    <div class="theme-header">👑 로얄</div>
+    <div class="theme-content">
+      <h3>고급스럽고 우아한 보라 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">보라색과 핑크의 럭셔리한 느낌</div>
+    </div>
+  </div>
+  
+  <!-- 테마 7: 민트 -->
+  <div class="theme-showcase mint">
+    <div class="theme-header">🍃 민트</div>
+    <div class="theme-content">
+      <h3>상큼하고 깔끔한 민트 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">민트와 터콰이즈의 상쾌한 조합</div>
+    </div>
+  </div>
+  
+  <!-- 테마 8: 골드 -->
+  <div class="theme-showcase gold">
+    <div class="theme-header">✨ 골드</div>
+    <div class="theme-content">
+      <h3>화려하고 따뜻한 황금 테마</h3>
+      <div class="piano-demo">
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="white-key-demo"></div>
+        <div class="black-key-demo" style="left: 30px;"></div>
+        <div class="black-key-demo" style="left: 70px;"></div>
+        <div class="black-key-demo" style="left: 150px;"></div>
+      </div>
+      <div class="chord-buttons-demo">
+        <button class="chord-btn-demo">C</button>
+        <button class="chord-btn-demo">F</button>
+        <button class="chord-btn-demo">G</button>
+      </div>
+      <div class="theme-info">골드와 오렌지의 프리미엄한 느낌</div>
+    </div>
+  </div>
+  
+  <div style="height: 50px;"></div>
+</body>
+</html>
