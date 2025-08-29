@@ -68,23 +68,40 @@ function createKeys() {
 
 // 사운드 생성 (Web Audio API) 및 옥타브 지원
 const ctx = new (window.AudioContext || window.webkitAudioContext)();
-function playNote(noteWithOct) {
-  const now = ctx.currentTime;
+// iOS용: 첫 상호작용에서 오디오 컨텍스트 resume
+function resumeAudio() { if (ctx.state !== 'running') ctx.resume(); }
+// 폴리포니를 위한 active voice 맵
+const activeVoices = new Map(); // id -> {osc, gain}
+// 노트+옥타브 문자열을 주파수로 변환
+function noteToHz(noteWithOct) {
+  const m = /^([A-G]#?)(\d+)$/.exec(noteWithOct);
+  const base = m ? m[1] : noteWithOct;
+  const oct  = m ? parseInt(m[2],10) : 4;
+  let f = getFrequency(base);
+  return f * Math.pow(2, oct - 4);
+}
+// 노트 재생 시작
+function startNote(id, noteWithOct) {
+  resumeAudio();
+  if (activeVoices.has(id)) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = 'sine';
-  // 노트와 옥타브 분리
-  const m = /^([A-G]#?)(\d+)$/.exec(noteWithOct);
-  const base = m ? m[1] : noteWithOct;
-  const oct = m ? parseInt(m[2], 10) : 4;
-  let freq = getFrequency(base);
-  freq *= Math.pow(2, oct - 4);
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0.2, now);
-  gain.gain.linearRampToValueAtTime(0, now + 0.5);
+  osc.frequency.value = noteToHz(noteWithOct);
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.01);
   osc.connect(gain).connect(ctx.destination);
-  osc.start(now);
-  osc.stop(now + 0.5);
+  osc.start();
+  activeVoices.set(id, {osc, gain});
+}
+// 노트 멈춤
+function stopNote(id) {
+  const v = activeVoices.get(id); if (!v) return;
+  const now = ctx.currentTime;
+  v.gain.gain.cancelScheduledValues(now);
+  v.gain.gain.setTargetAtTime(0, now, 0.03);
+  v.osc.stop(now + 0.1);
+  activeVoices.delete(id);
 }
 
 // 노트명 -> 주파수 변환 (C4~B4)
@@ -106,117 +123,95 @@ function getFrequency(note) {
   return notes[note] || 440;
 }
 
-// 키보드 입력 처리
+// 키보드 입력 처리: start/stop 분리
 window.addEventListener('keydown', e => {
   if (e.repeat) return;
-  const key = e.key.toLowerCase();
-  let note = null;
-  const white = WHITE_KEYS.find(w => w.key === key);
-  const black = BLACK_KEYS.find(b => b.key === key);
-  if (white) note = white.note;
-  if (black) note = black.note;
-  if (note) {
-    playNote(note);
-    highlightKey(key);
-  }
+  const k = e.key.toLowerCase();
+  const white = WHITE_KEYS.find(w => w.key === k);
+  const black = BLACK_KEYS.find(b => b.key === k);
+  const base  = white?.note || black?.note;
+  if (!base) return;
+  startNote(base, base + '4');
+  highlightKey(k);
 });
 window.addEventListener('keyup', e => {
-  const key = e.key.toLowerCase();
-  unhighlightKey(key);
+  const k = e.key.toLowerCase();
+  const base = WHITE_KEYS.find(w => w.key === k)?.note || BLACK_KEYS.find(b => b.key === k)?.note;
+  if (base) stopNote(base);
+  unhighlightKey(k);
 });
 
-// 최근 3음 시퀀스 버퍼
-let chordBuffer = [];
-// 키 엘리먼트 활성화: 클래스 추가 및 화음 버퍼 업데이트
-function activateKeyEl(el) {
-  el.classList.add('active');
-  const note = el.dataset.note;
-  chordBuffer = chordBuffer.filter(n => n !== note);
-  chordBuffer.push(note);
-  if (chordBuffer.length > 3) chordBuffer.shift();
-  updateChordDisplay();
-}
-// 키 엘리먼트 비활성화: 클래스 제거
-function deactivateKeyEl(el) {
-  el.classList.remove('active');
-}
-
-function highlightKey(key) {
-  const el = document.querySelector(`[data-key="${key}"]`);
-  if (el) activateKeyEl(el);
-}
-function unhighlightKey(key) {
-  const el = document.querySelector(`[data-key="${key}"]`);
-  if (el) deactivateKeyEl(el);
-}
-
-// 최근 3음으로 화음 표시
-function updateChordDisplay() {
-  const display = document.getElementById('chord-display');
-  if (chordBuffer.length === 3) {
-    display.textContent = 'Chord: ' + chordBuffer.join(' ');
-  } else {
-    display.textContent = '';
-  }
-}
-
-// 마우스 클릭도 지원: 클릭한 엘리먼트 직접 활성/비활성화
+// 마우스 클릭/이동으로 sustain 및 gliss 지원
+let mouseDown = false;
 piano.addEventListener('mousedown', e => {
-  let el = e.target;
-  if (el.classList.contains('key-label')) el = el.parentElement;
-  if (el.classList.contains('white-key') || el.classList.contains('black-key')) {
-    playNote(el.dataset.note);
+  mouseDown = true;
+  let el = e.target.classList.contains('key-label') ? e.target.parentElement : e.target;
+  if (el?.dataset?.note) {
+    startNote(el.dataset.note, el.dataset.note);
     activateKeyEl(el);
   }
 });
-piano.addEventListener('mouseup', e => {
-  let el = e.target;
-  if (el.classList.contains('key-label')) el = el.parentElement;
-  if (el.classList.contains('white-key') || el.classList.contains('black-key')) {
-    deactivateKeyEl(el);
+piano.addEventListener('mousemove', e => {
+  if (!mouseDown) return;
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if (el?.dataset?.note && !activeVoices.has(el.dataset.note)) {
+    startNote(el.dataset.note, el.dataset.note);
+    activateKeyEl(el);
   }
 });
+window.addEventListener('mouseup', () => {
+  mouseDown = false;
+  // 모든 활성 보이스 정지
+  activeVoices.forEach((_, id) => stopNote(id));
+  document.querySelectorAll('.white-key.active, .black-key.active').forEach(el => deactivateKeyEl(el));
+});
 
-// 터치 멀티터치 지원
+// 터치 멀티터치 및 gliss 지원
 const touchMap = new Map();
-
-piano.addEventListener('touchstart', e => {
-  // 동시 터치 감지 로그
-  if (e.touches.length > 1) console.log(`Simultaneous touches: ${e.touches.length}`);
+function keyFromPoint(x,y) {
+  let el = document.elementFromPoint(x,y);
+  if (!el) return null;
+  if (el.classList.contains('key-label')) el = el.parentElement;
+  return el?.dataset?.note ? el : null;
+}
+function onTouchStart(e) {
   e.preventDefault();
-  for (const touch of e.changedTouches) {
-    let el = document.elementFromPoint(touch.clientX, touch.clientY);
+  for (const t of e.changedTouches) {
+    const el = keyFromPoint(t.clientX, t.clientY);
     if (!el) continue;
-    if (el.classList.contains('key-label')) el = el.parentElement;
-    if (el.classList.contains('white-key') || el.classList.contains('black-key')) {
-      const note = el.dataset.note;
-      playNote(note);
-      activateKeyEl(el);
-      touchMap.set(touch.identifier, el);
-    }
+    const id = 'touch-' + t.identifier;
+    startNote(id, el.dataset.note);
+    activateKeyEl(el);
+    touchMap.set(t.identifier, el);
   }
-});
-
-piano.addEventListener('touchend', e => {
+}
+function onTouchMove(e) {
   e.preventDefault();
-  for (const touch of e.changedTouches) {
-    const el = touchMap.get(touch.identifier);
-    if (el) {
-      deactivateKeyEl(el);
-      touchMap.delete(touch.identifier);
+  for (const t of e.changedTouches) {
+    const prev = touchMap.get(t.identifier);
+    const el = keyFromPoint(t.clientX, t.clientY);
+    if (el && el !== prev) {
+      if (prev) { deactivateKeyEl(prev); stopNote('touch-'+t.identifier); }
+      const id = 'touch-' + t.identifier;
+      startNote(id, el.dataset.note);
+      activateKeyEl(el);
+      touchMap.set(t.identifier, el);
     }
   }
-});
-
-piano.addEventListener('touchcancel', e => {
-  // 터치 취소도 해제 처리
-  for (const touch of e.changedTouches) {
-    const el = touchMap.get(touch.identifier);
-    if (el) {
-      deactivateKeyEl(el);
-      touchMap.delete(touch.identifier);
-    }
+}
+function onTouchEnd(e) {
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    const prev = touchMap.get(t.identifier);
+    if (prev) deactivateKeyEl(prev);
+    stopNote('touch-' + t.identifier);
+    touchMap.delete(t.identifier);
   }
-});
+}
+// passive:false로 등록
+piano.addEventListener('touchstart', onTouchStart, {passive:false});
+piano.addEventListener('touchmove', onTouchMove,   {passive:false});
+piano.addEventListener('touchend',  onTouchEnd,    {passive:false});
+piano.addEventListener('touchcancel', onTouchEnd,   {passive:false});
 
 createKeys();
