@@ -433,14 +433,9 @@ function normalizeNote(noteWithOctave) {
   const normalizedNote = flatToSharp[note] || note;
   return normalizedNote + octave;
 }
-let currentChord = null; // 현재 재생 중인 화음 정보
+let activeChords = new Map(); // 활성 화음들을 관리하는 맵
 
-function playChord(notesString) {
-  // 이전 화음이 재생 중이면 정지
-  if (currentChord) {
-    stopChord();
-  }
-  
+function playChord(notesString, chordButtonElement) {
   const notes = notesString.split(',');
   const chordId = 'chord-' + Date.now();
   const activeElements = [];
@@ -464,42 +459,63 @@ function playChord(notesString) {
     }
   });
   
-  // 현재 화음 정보 저장
-  currentChord = {
+  // 활성 화음 정보 저장
+  const chordInfo = {
     id: chordId,
     notes: notes,
-    elements: activeElements
+    elements: activeElements,
+    button: chordButtonElement
   };
   
+  activeChords.set(chordButtonElement, chordInfo);
+  
   // 화음 표시 업데이트
-  const chordDisplay = document.getElementById('chord-display');
-  if (chordDisplay) {
-    const chordName = notes.map(n => n.replace(/\d+/, '')).join(' - ');
-    chordDisplay.textContent = `현재 화음: ${chordName}`;
-  }
+  updateChordDisplay();
 }
 
-function stopChord() {
-  if (!currentChord) return;
+function stopChord(chordButtonElement) {
+  const chordInfo = activeChords.get(chordButtonElement);
+  if (!chordInfo) return;
   
   // 모든 노트 정지
-  currentChord.notes.forEach((note, index) => {
-    const noteId = currentChord.id + '-' + index;
+  chordInfo.notes.forEach((note, index) => {
+    const noteId = chordInfo.id + '-' + index;
     stopNote(noteId);
   });
   
   // 건반 시각적 비활성화
-  currentChord.elements.forEach(element => {
+  chordInfo.elements.forEach(element => {
     deactivateKeyEl(element);
   });
   
-  // 화음 표시 제거
+  // 활성 화음에서 제거
+  activeChords.delete(chordButtonElement);
+  
+  // 화음 표시 업데이트
+  updateChordDisplay();
+}
+
+// 모든 화음을 정지시키는 함수
+function stopAllChords() {
+  activeChords.forEach((chordInfo, button) => {
+    stopChord(button);
+  });
+}
+
+// 화음 표시를 업데이트하는 함수
+function updateChordDisplay() {
   const chordDisplay = document.getElementById('chord-display');
   if (chordDisplay) {
-    chordDisplay.textContent = '';
+    if (activeChords.size === 0) {
+      chordDisplay.textContent = '';
+    } else {
+      const chordNames = Array.from(activeChords.values()).map(chordInfo => {
+        const chordName = chordInfo.notes.map(n => n.replace(/\d+/, '')).join(' - ');
+        return chordName;
+      });
+      chordDisplay.textContent = `현재 화음: ${chordNames.join(' + ')}`;
+    }
   }
-  
-  currentChord = null;
 }
 
 // 화음 버튼 이벤트 리스너 추가
@@ -511,10 +527,8 @@ document.addEventListener('DOMContentLoaded', () => {
       currentKey = e.target.value;
       updateChordButtons();
       
-      // 현재 재생 중인 화음이 있으면 정지
-      if (currentChord) {
-        stopChord();
-      }
+      // 현재 재생 중인 모든 화음 정지
+      stopAllChords();
     });
   }
   
@@ -527,10 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
       chordInversions[degree] = inversion;
       updateChordButtons();
       
-      // 현재 재생 중인 화음이 있으면 정지
-      if (currentChord) {
-        stopChord();
-      }
+      // 현재 재생 중인 모든 화음 정지
+      stopAllChords();
     });
   });
   
@@ -540,19 +552,19 @@ document.addEventListener('DOMContentLoaded', () => {
     button.addEventListener('mousedown', (e) => {
       e.preventDefault();
       const notes = button.dataset.notes;
-      playChord(notes);
+      playChord(notes, button);
       
       // 버튼 클릭 피드백
       button.style.transform = 'scale(0.95)';
     });
     
     button.addEventListener('mouseup', () => {
-      stopChord();
+      stopChord(button);
       button.style.transform = '';
     });
     
     button.addEventListener('mouseleave', () => {
-      stopChord();
+      stopChord(button);
       button.style.transform = '';
     });
     
@@ -560,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
     button.addEventListener('touchstart', (e) => {
       e.preventDefault();
       const notes = button.dataset.notes;
-      playChord(notes);
+      playChord(notes, button);
       
       // 버튼 클릭 피드백
       button.style.transform = 'scale(0.95)';
@@ -568,13 +580,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     button.addEventListener('touchend', (e) => {
       e.preventDefault();
-      stopChord();
+      stopChord(button);
       button.style.transform = '';
     });
     
     button.addEventListener('touchcancel', (e) => {
       e.preventDefault();
-      stopChord();
+      stopChord(button);
       button.style.transform = '';
     });
   });
