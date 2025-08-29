@@ -6,6 +6,23 @@ body {
   transition: all 0.3s ease;
 }
 
+/* 헤더 컨테이너 - 제목과 조성 선택을 나란히 배치 */
+.header-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.header-container h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  color: #276749;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
 /* 테마 선택기 스타일 */
 .theme-selector {
   margin: 15px 0;
@@ -48,11 +65,13 @@ body {
 
 /* 조성 선택기 스타일 */
 .key-selector {
-  margin: 20px 0;
+  margin: 0;
   padding: 15px;
   background: rgba(255,255,255,0.9);
   border-radius: 10px;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   box-shadow: 0 2px 8px rgba(56,161,105,0.1);
 }
 
@@ -60,7 +79,8 @@ body {
   color: #2d3748;
   font-weight: bold;
   font-size: 16px;
-  margin-right: 10px;
+  margin: 0;
+  white-space: nowrap;
 }
 
 #key-select {
@@ -89,16 +109,16 @@ body {
 .piano-container {
   position: relative;
   width: 100vw;
-  height: 60vh;
+  height: 50vh;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
+  align-items: flex-start;
   margin: 0 auto;
   overflow: hidden;
 }
 #piano {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   position: relative;
   width: 100%;
   height: 100%;
@@ -130,7 +150,7 @@ body {
   position: absolute;
   top: 0;
   width: calc((100% / 21) * 0.6);
-  height: 30vh;
+  height: 25vh;
   background: #276749;
   border: 1px solid #38a169;
   border-radius: 0 0 4px 4px;
@@ -214,7 +234,7 @@ html, body {
   background: #48bb78;
   border: none;
   border-radius: 12px;
-  padding: 15px 25px;
+  padding: 25px 25px;
   color: white;
   font-size: 16px;
   font-weight: bold;
@@ -277,6 +297,16 @@ html, body {
 
 /* 모바일 반응형 */
 @media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  
+  .header-container h1 {
+    font-size: 2rem;
+  }
+  
   .chord-buttons {
     flex-direction: column;
     align-items: center;
@@ -309,15 +339,20 @@ html, body {
 }
 
 @media (max-width: 480px) {
+  .header-container h1 {
+    font-size: 1.8rem;
+  }
+  
   .key-selector {
-    margin: 15px 0;
+    margin: 0;
     padding: 10px;
+    flex-direction: column;
+    gap: 8px;
   }
   
   .key-selector label {
     font-size: 14px;
-    display: block;
-    margin-bottom: 8px;
+    margin: 0;
   }
   
   #key-select {

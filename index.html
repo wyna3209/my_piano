@@ -11,41 +11,31 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>🌿 피아노 웹앱</h1>
-  
-  <!-- 테마 선택 -->
-  <div class="theme-selector">
-    <label for="theme-select">테마 선택:</label>
-    <select id="theme-select">
-      <option value="classic">클래식 (기본)</option>
-      <option value="dark">다크 모드</option>
-      <option value="sunset">선셋</option>
-      <option value="ocean">오션</option>
-      <option value="forest">포레스트</option>
-      <option value="royal">로얄</option>
-    </select>
-  </div>
-  
-  <!-- 조성 선택 -->
-  <div class="key-selector">
-    <label for="key-select">조성 선택:</label>
-    <select id="key-select">
-      <option value="C">C 장조 (도)</option>
-      <option value="G">G 장조 (솔)</option>
-      <option value="D">D 장조 (레)</option>
-      <option value="A">A 장조 (라)</option>
-      <option value="E">E 장조 (미)</option>
-      <option value="B">B 장조 (시)</option>
-      <option value="F#">F# 장조 (파#)</option>
-      <option value="C#">C# 장조 (도#)</option>
-      <option value="F">F 장조 (파)</option>
-      <option value="Bb">Bb 장조 (시♭)</option>
-      <option value="Eb">Eb 장조 (미♭)</option>
-      <option value="Ab">Ab 장조 (라♭)</option>
-      <option value="Db">Db 장조 (레♭)</option>
-      <option value="Gb">Gb 장조 (솔♭)</option>
-      <option value="Cb">Cb 장조 (도♭)</option>
-    </select>
+  <!-- 제목과 조성 선택을 나란히 배치 -->
+  <div class="header-container">
+    <h1>🌿 피아노 웹앱</h1>
+    
+    <!-- 조성 선택 -->
+    <div class="key-selector">
+      <label for="key-select">조성 선택:</label>
+      <select id="key-select">
+        <option value="C">C 장조 (도)</option>
+        <option value="G">G 장조 (솔)</option>
+        <option value="D">D 장조 (레)</option>
+        <option value="A">A 장조 (라)</option>
+        <option value="E">E 장조 (미)</option>
+        <option value="B">B 장조 (시)</option>
+        <option value="F#">F# 장조 (파#)</option>
+        <option value="C#">C# 장조 (도#)</option>
+        <option value="F">F 장조 (파)</option>
+        <option value="Bb">Bb 장조 (시♭)</option>
+        <option value="Eb">Eb 장조 (미♭)</option>
+        <option value="Ab">Ab 장조 (라♭)</option>
+        <option value="Db">Db 장조 (레♭)</option>
+        <option value="Gb">Gb 장조 (솔♭)</option>
+        <option value="Cb">Cb 장조 (도♭)</option>
+      </select>
+    </div>
   </div>
   
   <div class="piano-container">

@@ -98,6 +98,7 @@ function positionBlackKey(blackKey, parentWhiteKey) {
     if (parentWhiteKey.offsetWidth > 0) {
       const left = parentWhiteKey.offsetLeft + parentWhiteKey.offsetWidth * 0.95 - blackKey.offsetWidth / 2;
       blackKey.style.left = `${left}px`;
+      blackKey.style.top = '0px'; // 명시적으로 top 위치 설정
     }
   };
   
