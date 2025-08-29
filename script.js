@@ -214,4 +214,32 @@ piano.addEventListener('touchmove', onTouchMove,   {passive:false});
 piano.addEventListener('touchend',  onTouchEnd,    {passive:false});
 piano.addEventListener('touchcancel', onTouchEnd,   {passive:false});
 
+// 키보드용 하이라이트 함수들
+function highlightKey(keyChar) {
+  const element = document.querySelector(`[data-key="${keyChar}"]`);
+  if (element) {
+    element.classList.add('active');
+  }
+}
+
+function unhighlightKey(keyChar) {
+  const element = document.querySelector(`[data-key="${keyChar}"]`);
+  if (element) {
+    element.classList.remove('active');
+  }
+}
+
+// 마우스/터치용 활성화 함수들
+function activateKeyEl(element) {
+  if (element) {
+    element.classList.add('active');
+  }
+}
+
+function deactivateKeyEl(element) {
+  if (element) {
+    element.classList.remove('active');
+  }
+}
+
 createKeys();
