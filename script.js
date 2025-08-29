@@ -177,4 +177,44 @@ piano.addEventListener('mouseup', e => {
   }
 });
 
+// 터치 멀티터치 지원
+const touchMap = new Map();
+
+piano.addEventListener('touchstart', e => {
+  e.preventDefault();
+  for (const touch of e.changedTouches) {
+    let el = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (!el) continue;
+    if (el.classList.contains('key-label')) el = el.parentElement;
+    if (el.classList.contains('white-key') || el.classList.contains('black-key')) {
+      const note = el.dataset.note;
+      playNote(note);
+      activateKeyEl(el);
+      touchMap.set(touch.identifier, el);
+    }
+  }
+});
+
+piano.addEventListener('touchend', e => {
+  e.preventDefault();
+  for (const touch of e.changedTouches) {
+    const el = touchMap.get(touch.identifier);
+    if (el) {
+      deactivateKeyEl(el);
+      touchMap.delete(touch.identifier);
+    }
+  }
+});
+
+piano.addEventListener('touchcancel', e => {
+  // 터치 취소도 해제 처리
+  for (const touch of e.changedTouches) {
+    const el = touchMap.get(touch.identifier);
+    if (el) {
+      deactivateKeyEl(el);
+      touchMap.delete(touch.identifier);
+    }
+  }
+});
+
 createKeys();
